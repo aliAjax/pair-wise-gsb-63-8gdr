@@ -10,6 +10,7 @@ let disconnect: () => void = () => undefined
 
 const pageTitle = computed(() => {
   if (route.name === 'defects') return '缺陷处置看板'
+  if (route.name === 'sync') return '离线同步与冲突裁决'
   if (route.name === 'audit') return '检验审计'
   if (route.name === 'record') return '检验任务详情'
   return '日常检验总览'
@@ -34,12 +35,13 @@ onUnmounted(() => disconnect())
       <nav>
         <RouterLink to="/"><span>01</span>检验总览</RouterLink>
         <RouterLink to="/defects"><span>02</span>缺陷处置</RouterLink>
-        <RouterLink to="/audit"><span>03</span>操作审计</RouterLink>
+        <RouterLink to="/sync"><span>03</span>同步裁决</RouterLink>
+        <RouterLink to="/audit"><span>04</span>操作审计</RouterLink>
       </nav>
       <div class="sidebar-status">
-        <i />
+        <i :class="{ offline: store.offline }" />
         <div>
-          <strong>{{ store.liveMessage }}</strong>
+          <strong>{{ store.offline ? '断网演练中：批次写入将失败' : store.liveMessage }}</strong>
           <small>数据保存在本机浏览器</small>
         </div>
       </div>

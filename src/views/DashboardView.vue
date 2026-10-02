@@ -54,6 +54,14 @@ function createRecord() {
       <article><span>停用设备</span><strong>{{ store.stats.blocked }}</strong><small>需优先核实隔离状态</small></article>
       <article><span>临近超期</span><strong>{{ store.stats.overdue }}</strong><small>按整改截止日计算</small></article>
       <article><span>已闭环</span><strong>{{ store.stats.closed }}</strong><small>异常项已复核完成</small></article>
+      <article><span>未接收批次</span><strong>{{ store.syncStats.pendingBatches }}</strong><small>离线包待回连重试</small></article>
+      <article><span>待裁决冲突</span><strong>{{ store.syncStats.pendingConflicts }}</strong><small>同字段两版待确认</small></article>
+      <article><span>失效待重核</span><strong>{{ store.syncStats.invalidConclusions + store.syncStats.invalidDefects }}</strong><small>结论与缺陷需重核</small></article>
+    </div>
+
+    <div v-if="store.syncStats.pendingBatches || store.syncStats.pendingConflicts" class="sync-banner">
+      <span>同步链有 {{ store.syncStats.pendingBatches }} 个未接收批次、{{ store.syncStats.pendingConflicts }} 个待裁决冲突。</span>
+      <a @click="router.push('/sync')">去同步中心处理 →</a>
     </div>
 
     <div class="toolbar">
