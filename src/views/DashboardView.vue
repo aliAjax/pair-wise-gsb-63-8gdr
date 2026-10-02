@@ -38,6 +38,20 @@ const columns = [
 const riskType = (risk: RiskLevel) => risk === '紧急' ? 'error' : risk === '高' ? 'warning' : 'default'
 const validDraft = computed(() => draft.value.deviceCode && draft.value.deviceName && draft.value.assignedTo && draft.value.dueDate)
 
+const syncAlert = computed(() => ({
+  pending: store.pendingBatches.length,
+  conflicts: store.pendingConflicts.length,
+  recheck: store.recheckRecords.length
+}))
+
+function syncNow() {
+  const result = store.syncAll()
+  if (result.failed) message.error(`${result.failed} 个批次写入失败，已标记待重试`)
+  if (result.conflicted) message.warning(`${result.conflicted} 个批次存在字段冲突，待值班长确认`)
+  if (result.synced) message.success(`${result.synced} 个断网包已按字段合并`)
+  if (!result.failed && !result.conflicted && !result.synced) message.info('没有待同步批次')
+}
+
 function createRecord() {
   if (!validDraft.value) return
   const record = store.addRecord(draft.value)
@@ -54,6 +68,16 @@ function createRecord() {
       <article><span>停用设备</span><strong>{{ store.stats.blocked }}</strong><small>需优先核实隔离状态</small></article>
       <article><span>临近超期</span><strong>{{ store.stats.overdue }}</strong><small>按整改截止日计算</small></article>
       <article><span>已闭环</span><strong>{{ store.stats.closed }}</strong><small>异常项已复核完成</small></article>
+    </div>
+
+    <div v-if="syncAlert.pending || syncAlert.conflicts || syncAlert.recheck" class="sync-banner">
+      <span v-if="syncAlert.pending">待上传断网包 {{ syncAlert.pending }} 个</span>
+      <span v-if="syncAlert.conflicts">字段冲突待值班长确认 {{ syncAlert.conflicts }} 项</span>
+      <span v-if="syncAlert.recheck">结论失效待重核 {{ syncAlert.recheck }} 台</span>
+      <div>
+        <NButton size="small" type="primary" :disabled="!store.online" @click="syncNow">立即同步</NButton>
+        <NButton size="small" tertiary @click="router.push('/sync')">同步中心</NButton>
+      </div>
     </div>
 
     <div class="toolbar">

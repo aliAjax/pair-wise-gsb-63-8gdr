@@ -34,7 +34,9 @@ export function createOfflineInspection(draft: InspectionDraft): InspectionRecor
     evidenceCount: 0,
     version: 1,
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
+    recheckNeeded: false,
+    lastBatchId: ''
   }
 }
 

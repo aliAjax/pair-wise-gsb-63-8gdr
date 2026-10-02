@@ -24,6 +24,7 @@ const grouped = computed(() => Object.fromEntries(columns.map((status) => [statu
           <div><NTag :type="record.risk === '紧急' ? 'error' : record.risk === '高' ? 'warning' : 'default'" size="small" :bordered="false">{{ record.risk }}风险</NTag><small>V{{ record.version }}</small></div>
           <h3>{{ record.deviceName }}</h3>
           <p>{{ record.deviceCode }} · {{ record.area }}</p>
+          <NTag v-if="record.recheckNeeded" type="error" size="small" :bordered="false" class="recheck-tag">结论失效待重核</NTag>
           <footer><span>{{ record.assignedTo }}</span><span :class="{ overdue: record.dueDate <= '2026-09-29' }">{{ record.dueDate }} 截止</span></footer>
         </article>
         <div v-if="!grouped[column].length" class="kanban-empty">暂无任务</div>
